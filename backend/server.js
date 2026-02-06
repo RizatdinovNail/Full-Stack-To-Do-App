@@ -3,12 +3,28 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const dns = require("dns");
+const bcrypt = require("bcrypt");
+
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
+
+/*const saltRounds = 10;
+
+bcrypt.genSalt(saltRounds, (err, salt) => {
+  if (err) {
+    return;
+  }
+
+  const userPassword = "Slavyan1n-Slav";
+  bcrypt.hash(userPassword, salt, (err, hash) => {
+    if (err) return;
+    console.log("Hashed password:", hash);
+  });
+});*/
 
 mongoose
   .connect(process.env.MONGO_URI)
