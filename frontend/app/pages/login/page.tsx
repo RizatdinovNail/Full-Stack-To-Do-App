@@ -43,6 +43,7 @@ export default function Login({ switchView }) {
       const token = res.data.token;
       localStorage.setItem("token", token);
       console.log("User logged in");
+      switchView;
     } catch (error) {
       console.error("Error login the user", error);
       setLoginError(true);

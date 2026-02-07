@@ -55,6 +55,7 @@ export default function Register({ switchView }) {
         { headers: { "Content-Type": "application/json" } },
       );
       console.log("User addded successfully");
+      switchView();
     } catch (error) {
       console.error("Error creting user", error);
     }
