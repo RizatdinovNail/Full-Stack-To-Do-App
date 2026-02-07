@@ -1,18 +1,25 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
-const dns = require("dns");
-const authRoutes = require("./routes/Auth");
-const auth = require("./routes/Middleware");
+import express from "express";
+import bodyParser from "body-parser";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import dns from "dns";
+import authRoutes from "./routes/Auth.js";
+import cors from "cors";
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 dotenv.config();
 
 const app = express();
-app.use(bodyParser.json());
+app.use(
+  cors({
+    origin: process.env.ORIGIN_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  }),
+);
 
+app.use(bodyParser.json());
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
@@ -25,7 +32,7 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-app.unsubscribe("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
