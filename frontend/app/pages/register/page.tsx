@@ -2,7 +2,11 @@
 import axios from "axios";
 import { useState } from "react";
 
-export default function Register({ switchView }) {
+interface RegisterProps {
+  switchView: (value: boolean) => void;
+}
+
+export default function Register({ switchView }: RegisterProps) {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -45,7 +49,7 @@ export default function Register({ switchView }) {
     },
   ];
 
-  const registerUser = async (e) => {
+  const registerUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -55,13 +59,13 @@ export default function Register({ switchView }) {
         { headers: { "Content-Type": "application/json" } },
       );
       console.log("User addded successfully");
-      switchView();
+      switchView(false);
     } catch (error) {
       console.error("Error creting user", error);
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -109,7 +113,10 @@ export default function Register({ switchView }) {
         <section className="flex flex-col mt-8 gap-8">
           <article className="flex flex-col items-center">
             <p>Do you have an account?</p>
-            <button className="font-bold pointer" onClick={switchView}>
+            <button
+              className="font-bold pointer"
+              onClick={() => switchView(true)}
+            >
               Log in
             </button>
           </article>

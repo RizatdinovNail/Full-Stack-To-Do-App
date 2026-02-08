@@ -1,14 +1,80 @@
 "use client";
 
-export default function MainPage({ switchView }) {
+import api from "@/app/api/api";
+import { useEffect, useState } from "react";
+
+interface mainPageProps {
+  switchView: (value: boolean) => void;
+}
+
+interface Todo {
+  _id: string;
+  title: string;
+  completed: boolean;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  dueDate: string | null;
+  tagIds: Tag[];
+}
+
+interface Tag {
+  _id: string;
+  name: string;
+  userId: string;
+  color: string;
+  createdAt: string;
+}
+
+export default function MainPage({ switchView }: mainPageProps) {
+  const [todoTitle, setToDoTitle] = useState("");
+  const [errorCreatingToDo, setError] = useState(false);
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  async function createTodo() {
+    if (todoTitle === "") {
+      return setError(true);
+    } else {
+      await api.post("/todos", { title: todoTitle });
+      addTodo();
+      setToDoTitle("");
+    }
+  }
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const fetchTodos = async () => {
+    const res = await api.get<Todo[]>("/todos");
+    console.log(res);
+    setTodos(res.data);
+  };
+
+  const addTodo = async () => {
+    const res = await api.post("/todos", { todoTitle });
+    setTodos((prev) => [...prev, res.data]);
+  };
+
   return (
     <div className="flex flex-col gap-4 w-full">
       <h1 className="text-[42px] text-center">Add your Todo</h1>
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-12 relative h-screen">
         <section className="flex flex-col gap-2">
           <article className="bg-black flex justify-between p-2 gap-2">
-            <input className="bg-black text-white w-full"></input>
-            <button className="bg-white text-black p-2 px-4">Add</button>
+            <input
+              className="bg-black text-white w-full"
+              value={todoTitle}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setToDoTitle(e.target.value)
+              }
+            ></input>
+            <button
+              className="bg-white text-black p-2 px-4"
+              onClick={() => createTodo()}
+            >
+              Add
+            </button>
           </article>
           <section className="flex">
             <section>
@@ -28,8 +94,8 @@ export default function MainPage({ switchView }) {
                 <g id="SVGRepo_iconCarrier">
                   {" "}
                   <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
                     d="M5.78584 3C4.24726 3 3 4.24726 3 5.78584C3 6.59295 3.28872 7.37343 3.81398 7.98623L6.64813 11.2927C7.73559 12.5614 8.33333 14.1773 8.33333 15.8483V18C8.33333 19.6569 9.67648 21 11.3333 21H12.6667C14.3235 21 15.6667 19.6569 15.6667 18V15.8483C15.6667 14.1773 16.2644 12.5614 17.3519 11.2927L20.186 7.98624C20.7113 7.37343 21 6.59294 21 5.78584C21 4.24726 19.7527 3 18.2142 3H5.78584Z"
                     fill="#000000"
                   ></path>{" "}
@@ -57,33 +123,36 @@ export default function MainPage({ switchView }) {
 
         <section>
           <ul className="flex gap-4 flex-col">
-            <li className="flex gap-2 items-center justify-between">
-              <article className="bg-black text-white flex justify-between p-2 items-center w-full">
-                Great Thing to-do
-                <span className="flex gap-4 items-center">
-                  <section className="flex gap-2 text-[0.6rem]">
-                    <p>Tag1</p>
-                    <p>Tag2</p>
-                  </section>
-                  <section className="">···</section>
-                </span>
-              </article>
-              <p> ✓</p>
-            </li>
-            <li className="flex gap-2 items-center justify-between">
-              <article className="bg-black text-white flex justify-between p-2 items-center w-full">
-                Great Thing to-do
-                <span className="flex gap-4 items-center">
-                  <section className="flex gap-2 text-[0.6rem]">
-                    <p>Tag1</p>
-                    <p>Tag2</p>
-                  </section>
-                  <section className="">···</section>
-                </span>
-              </article>
-              <p> ✓</p>
-            </li>
+            {todos.map((todo) => (
+              <li
+                key={todo._id}
+                className="flex gap-2 items-center justify-between"
+              >
+                <article className="bg-blue-500 text-white flex justify-between p-2 items-center w-full">
+                  {todo.title}
+                  <span className="flex gap-4 items-center">
+                    <section className="flex gap-2 text-[0.6rem]">
+                      {todo.tagIds.map((tag) => (
+                        <p
+                          key={tag._id}
+                          className={`bg-${tag.color} text-white`}
+                        >
+                          {tag.name}
+                        </p>
+                      ))}
+                    </section>
+                    <section className="">···</section>
+                  </span>
+                </article>
+                <p> ✓</p>
+              </li>
+            ))}
           </ul>
+        </section>
+        <section
+          className={`${errorCreatingToDo ? "block" : "hidden"} absolute bottom-0 bg-red-500 w-full p-4 justify-center flex  rounded-2xl text-[1.2rem] font-bold`}
+        >
+          <p>The todo title can not be empty!</p>
         </section>
       </div>
     </div>

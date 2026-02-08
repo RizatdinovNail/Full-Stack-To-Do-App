@@ -3,7 +3,11 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function Login({ switchView }) {
+interface LoginProps {
+  switchView: (value: boolean) => void;
+}
+
+export default function Login({ switchView }: LoginProps) {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -31,7 +35,7 @@ export default function Login({ switchView }) {
     },
   ];
 
-  const loginUser = async (e) => {
+  const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -43,14 +47,14 @@ export default function Login({ switchView }) {
       const token = res.data.token;
       localStorage.setItem("token", token);
       console.log("User logged in");
-      switchView;
+      switchView(false);
     } catch (error) {
       console.error("Error login the user", error);
       setLoginError(true);
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -99,7 +103,10 @@ export default function Login({ switchView }) {
         <section className="flex flex-col mt-8 gap-8">
           <article className="flex flex-col items-center">
             <p>Don't have an account yet?</p>
-            <button className="font-bold pointer" onClick={switchView}>
+            <button
+              className="font-bold pointer"
+              onClick={() => switchView(true)}
+            >
               Sign Up
             </button>
           </article>

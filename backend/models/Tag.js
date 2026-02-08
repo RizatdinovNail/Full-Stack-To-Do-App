@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
 
 const tagSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true,
-  },
   userId: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   name: {
@@ -23,4 +20,6 @@ const tagSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("Tags", tagSchema);
+const Tag = mongoose.model("Tags", tagSchema);
+
+export default Tag;

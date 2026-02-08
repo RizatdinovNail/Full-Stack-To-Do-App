@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
 
 const toDoSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true,
-  },
   userId: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true,
   },
   title: {
@@ -16,6 +13,7 @@ const toDoSchema = new mongoose.Schema({
   completed: {
     type: Boolean,
     required: true,
+    default: false,
   },
   dueDate: {
     type: Date,
@@ -29,8 +27,15 @@ const toDoSchema = new mongoose.Schema({
     default: Date.now,
   },
   tagIds: {
-    type: [],
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tags",
+      },
+    ],
   },
 });
 
-export default mongoose.model("ToDos", toDoSchema);
+const ToDo = mongoose.model("ToDos", toDoSchema);
+
+export default ToDo;
