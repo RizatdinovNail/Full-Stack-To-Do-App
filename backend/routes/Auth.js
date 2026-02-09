@@ -27,16 +27,6 @@ router.post("/register", async (req, res) => {
       });
 
       await newUser.save();
-
-      const basicTag = new Tag({
-        name: "Great Todo",
-        color: "#00000",
-        createdAt: Date.now(),
-        userId: newUser._id,
-      });
-
-      await basicTag.save();
-
       res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
       console.error(error);
@@ -68,8 +58,6 @@ router.post("/login", async (req, res) => {
 //======================= TODOS AUTH =======================
 router.post("/todos", middleware, async (req, res) => {
   try {
-    const defaultTags = await Tag.find({ userId: req.body.userId });
-    const tagIds = defaultTags.map((tag) => tag._id);
     const todo = await ToDo.create({
       title: req.body.title,
       userId: req.user.userId,
@@ -77,9 +65,7 @@ router.post("/todos", middleware, async (req, res) => {
       createdAt: Date.now(),
       dueDate: null,
       updatedAt: Date.now(),
-      tagIds,
     });
-    await todo.populate("tagIds");
     res.status(201).json({ message: "Todo added successfully" });
   } catch (error) {
     console.error("Failed to create todo: " + error);
@@ -89,13 +75,57 @@ router.post("/todos", middleware, async (req, res) => {
 
 router.get("/todos", middleware, async (req, res) => {
   try {
-    const todos = await ToDo.find({ userId: req.user.userId }).populate(
-      "tagIds",
-    );
+    const todos = await ToDo.find({ userId: req.user.userId });
     res.json(todos);
   } catch (error) {
     console.error("Failed to get todos: " + error);
     res.status(500).json({ error: "Failed to get todos" });
+  }
+});
+
+router.delete("/todos/:id", middleware, async (req, res) => {
+  try {
+    const todoId = req.params.id;
+    const deletedTodo = await ToDo.findOneAndDelete({
+      _id: todoId,
+      userId: req.user.userId,
+    });
+
+    if (!deletedTodo) {
+      return res.status(404).json({ error: "Todo no found" });
+    }
+
+    const todos = await ToDo.find({ userId: req.user.userId });
+    res.json(todos);
+  } catch (error) {
+    console.error("Failed to delete todo: " + error);
+  }
+});
+
+router.patch("/todos/:id", middleware, async (req, res) => {
+  try {
+    const todoId = req.params.id;
+    const updatedTodo = await Todo.findOneAndUpdate(
+      {
+        _id: todoId,
+        userId: req.user.userId,
+      },
+      {
+        ...req.body,
+        title: title,
+        completed: completed,
+        dueDate: dueDate,
+        updatedAt: Date.now(),
+      },
+    );
+
+    if (!updatedTodo) {
+      return res.status(400).json({ error: "Todo not found" });
+    }
+
+    res.send(updatedTodo);
+  } catch (error) {
+    console.error("Failed to update todo: " + error);
   }
 });
 

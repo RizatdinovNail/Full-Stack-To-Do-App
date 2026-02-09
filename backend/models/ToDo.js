@@ -26,14 +26,6 @@ const toDoSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  tagIds: {
-    type: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Tags",
-      },
-    ],
-  },
 });
 
 const ToDo = mongoose.model("ToDos", toDoSchema);

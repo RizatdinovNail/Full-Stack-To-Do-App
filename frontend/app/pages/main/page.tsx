@@ -26,17 +26,34 @@ interface Tag {
   createdAt: string;
 }
 
+interface Filter {
+  name: string;
+}
+
 export default function MainPage({ switchView }: mainPageProps) {
   const [todoTitle, setToDoTitle] = useState("");
   const [errorCreatingToDo, setError] = useState(false);
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [filters, setFilters] = useState<Filter[]>([]);
+  const [todoDesc, setTodoDesc] = useState(false);
+  const [chosenTodo, setChosenTodo] = useState<Todo>();
+  const [chosenTodoTitle, setChosenTodoTitle] = useState("");
+
+  const allFilters = [
+    {
+      name: "Filter1",
+    },
+    {
+      name: "Filter2",
+    },
+  ];
 
   async function createTodo() {
     if (todoTitle === "") {
       return setError(true);
     } else {
       await api.post("/todos", { title: todoTitle });
-      addTodo();
+      fetchTodos();
       setToDoTitle("");
     }
   }
@@ -47,19 +64,34 @@ export default function MainPage({ switchView }: mainPageProps) {
 
   const fetchTodos = async () => {
     const res = await api.get<Todo[]>("/todos");
-    console.log(res);
     setTodos(res.data);
   };
 
-  const addTodo = async () => {
-    const res = await api.post("/todos", { todoTitle });
-    setTodos((prev) => [...prev, res.data]);
+  const deleteToDo = async (todoId: string) => {
+    try {
+      setTodoDesc(false);
+      const res = await api.delete<Todo[]>(`/todos/${todoId}`);
+
+      setTodos(res.data);
+    } catch (error) {
+      console.error("Failed to get backend res: " + error);
+    }
+  };
+
+  const updateToDo = async (todoId: string) => {
+    try {
+      setTodoDesc(false);
+      const res = await api.patch<Todo>(`/todos/${todoId}`);
+      setTodos(res.data);
+    } catch (error) {
+      console.error("Failed to update todo: " + error);
+    }
   };
 
   return (
     <div className="flex flex-col gap-4 w-full">
       <h1 className="text-[42px] text-center">Add your Todo</h1>
-      <div className="flex flex-col gap-12 relative h-screen">
+      <div className="flex flex-col gap-12 h-screen">
         <section className="flex flex-col gap-2">
           <article className="bg-black flex justify-between p-2 gap-2">
             <input
@@ -109,14 +141,15 @@ export default function MainPage({ switchView }: mainPageProps) {
           </section>
           <section>
             <ul className="flex gap-4">
-              <li className="bg-black text-white px-2 py-1 text-[0.8rem] flex items-center gap-2">
-                Filter1
-                <span>x</span>
-              </li>
-              <li className="bg-black text-white px-2 py-1 text-[0.8rem] flex items-center gap-2">
-                Filter2
-                <span>x</span>
-              </li>
+              {filters.map((filter) => (
+                <li
+                  key={filter.name}
+                  className="bg-black text-white px-2 py-1 text-[0.8rem] flex items-center gap-2"
+                >
+                  {filter.name}
+                  <span>x</span>
+                </li>
+              ))}
             </ul>
           </section>
         </section>
@@ -131,7 +164,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                 <article className="bg-blue-500 text-white flex justify-between p-2 items-center w-full">
                   {todo.title}
                   <span className="flex gap-4 items-center">
-                    <section className="flex gap-2 text-[0.6rem]">
+                    {/*<section className="flex gap-2 text-[0.6rem]">
                       {todo.tagIds.map((tag) => (
                         <p
                           key={tag._id}
@@ -140,19 +173,85 @@ export default function MainPage({ switchView }: mainPageProps) {
                           {tag.name}
                         </p>
                       ))}
-                    </section>
-                    <section className="">···</section>
+                    </section>*/}
+                    <p
+                      className="pointer"
+                      onClick={() => {
+                        setTodoDesc(true);
+                        setChosenTodo(todo);
+                        setChosenTodoTitle(chosenTodo.title);
+                      }}
+                    >
+                      ···
+                    </p>
                   </span>
                 </article>
-                <p> ✓</p>
+                <p
+                  onClick={() => {
+                    setChosenTodo(todo);
+                  }}
+                >
+                  ✓
+                </p>
               </li>
             ))}
           </ul>
         </section>
         <section
-          className={`${errorCreatingToDo ? "block" : "hidden"} absolute bottom-0 bg-red-500 w-full p-4 justify-center flex  rounded-2xl text-[1.2rem] font-bold`}
+          className={`${errorCreatingToDo ? "block" : "hidden"} absolute bottom-4 bg-red-500 right-4 left-4 p-4 justify-center flex  rounded-2xl text-[1.2rem] font-bold`}
         >
-          <p>The todo title can not be empty!</p>
+          <p>The To-do title can not be empty!</p>
+        </section>
+        <section
+          className={`absolute top-0 bottom-0 right-0 left-0 bg-black/80 rounded-3xl ${todoDesc ? "block" : "hidden"} flex justify-center items-center`}
+        >
+          <section className="bg-white p-4 relative w-80 flex flex-col gap-8">
+            <article className="flex items-center justify-center">
+              <input
+                className="text-[1.3rem] text-center"
+                value={chosenTodoTitle}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setChosenTodoTitle(e.target.value)
+                }
+              ></input>
+              <p
+                className="absolute right-4"
+                onClick={() => {
+                  setTodoDesc(false);
+                }}
+              >
+                x
+              </p>
+            </article>
+            <article>
+              <h1 className="flex justify-between">
+                Time of creation <span>{chosenTodo?.createdAt}</span>
+              </h1>
+              <h1 className="flex justify-between">
+                Due to <span>{chosenTodo?.dueDate}</span>
+              </h1>
+              <h1 className="flex justify-between">
+                Completed <span>{chosenTodo?.completed.toString()}</span>
+              </h1>
+              <h1 className="flex justify-between">
+                Tags <span>Tag</span>
+              </h1>
+            </article>
+            <section className="flex justify-between gap-4">
+              <button
+                className="bg-black text-white p-2 pointer text-[1.2rem] w-full"
+                onClick={() => deleteToDo(chosenTodo._id)}
+              >
+                Delete
+              </button>
+              <button
+                className="bg-black text-white p-2 pointer text-[1.2rem] w-full"
+                onClick={() => updateToDo(chosenTodo._id)}
+              >
+                Update
+              </button>
+            </section>
+          </section>
         </section>
       </div>
     </div>
