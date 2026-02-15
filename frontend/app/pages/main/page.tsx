@@ -38,6 +38,10 @@ export default function MainPage({ switchView }: mainPageProps) {
   const [todoDesc, setTodoDesc] = useState(false);
   const [chosenTodo, setChosenTodo] = useState<Todo>();
   const [chosenTodoTitle, setChosenTodoTitle] = useState("");
+  const [chosenTodoCompletionState, setChosenTodoCompletionState] =
+    useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
 
   const allFilters = [
     {
@@ -73,8 +77,6 @@ export default function MainPage({ switchView }: mainPageProps) {
       const res = await api.delete<Todo[]>(`/todos/${todoId}`);
 
       setTodos(res.data);
-      setChosenTodoTitle("");
-      setChosenTodo(undefined);
     } catch (error) {
       console.error("Failed to get backend res: " + error);
     }
@@ -85,15 +87,21 @@ export default function MainPage({ switchView }: mainPageProps) {
       setTodoDesc(false);
       const res = await api.patch<Todo>(`/todos/${todoId}`, {
         title: chosenTodoTitle,
+        completed: chosenTodoCompletionState,
       });
       setTodos((prev) =>
         prev.map((todo) => (todo._id === todoId ? res.data : todo)),
       );
-      setChosenTodoTitle("");
-      setChosenTodo(undefined);
     } catch (error) {
       console.error("Failed to update todo: " + error);
     }
+  };
+
+  const searchToDo = (query: string) => {
+    const filtered = todos.filter((todo) =>
+      todo.title.toLowerCase().includes(query.toLowerCase()),
+    );
+    setFilteredTodos(filtered);
   };
 
   return (
@@ -104,10 +112,16 @@ export default function MainPage({ switchView }: mainPageProps) {
           <article className="bg-black flex justify-between p-2 gap-2">
             <input
               className="bg-black text-white w-full"
+              placeholder="Ex: Walk a dog"
               value={todoTitle}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setToDoTitle(e.target.value)
               }
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === "Enter") {
+                  createTodo();
+                }
+              }}
             ></input>
             <button
               className="bg-white text-black p-2 px-4"
@@ -117,7 +131,7 @@ export default function MainPage({ switchView }: mainPageProps) {
             </button>
           </article>
           <section className="flex">
-            <section>
+            <section className="cursor-pointer">
               <svg
                 viewBox="0 0 24 24"
                 width="36"
@@ -145,6 +159,11 @@ export default function MainPage({ switchView }: mainPageProps) {
             <input
               className="bg-black text-white w-full p-2"
               placeholder="Search..."
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+                setSearchInput(value);
+                searchToDo(value);
+              }}
             ></input>
           </section>
           <section>
@@ -164,10 +183,10 @@ export default function MainPage({ switchView }: mainPageProps) {
 
         <section>
           <ul className="flex gap-4 flex-col">
-            {todos.map((todo) => (
+            {(searchInput ? filteredTodos : todos).map((todo) => (
               <li
                 key={todo._id}
-                className="flex gap-2 items-center justify-between"
+                className={`flex gap-2 items-center justify-between ${todo.completed ? "hidden" : "block"}`}
               >
                 <article className="bg-blue-500 text-white flex justify-between p-2 items-center w-full">
                   {todo.title}
@@ -183,7 +202,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                       ))}
                     </section>*/}
                     <p
-                      className="pointer"
+                      className="cursor-pointer"
                       onClick={() => {
                         setChosenTodo(todo);
                         setChosenTodoTitle(todo.title);
@@ -197,7 +216,10 @@ export default function MainPage({ switchView }: mainPageProps) {
                 <p
                   onClick={() => {
                     setChosenTodo(todo);
+                    setChosenTodoCompletionState(true);
+                    updateToDo(todo._id);
                   }}
+                  className="cursor-pointer"
                 >
                   ✓
                 </p>
@@ -223,7 +245,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                 }
               ></input>
               <p
-                className="absolute right-4"
+                className="absolute right-4 cursor-pointer"
                 onClick={() => {
                   setTodoDesc(false);
                 }}
@@ -233,13 +255,24 @@ export default function MainPage({ switchView }: mainPageProps) {
             </article>
             <article>
               <h1 className="flex justify-between">
-                Time of creation <span>{chosenTodo?.createdAt}</span>
+                Time of creation{" "}
+                <span>
+                  {chosenTodo
+                    ? new Date(chosenTodo.createdAt).toISOString().split("T")[0]
+                    : "Error"}
+                </span>
               </h1>
               <h1 className="flex justify-between">
-                Due to <span>{chosenTodo?.dueDate}</span>
+                Last Updated{" "}
+                <span>
+                  {chosenTodo
+                    ? new Date(chosenTodo.updatedAt).toISOString().split("T")[0]
+                    : "Error"}
+                </span>
               </h1>
               <h1 className="flex justify-between">
-                Completed <span>{chosenTodo?.completed.toString()}</span>
+                Due to{" "}
+                <span>{`${chosenTodo?.dueDate ? chosenTodo?.dueDate : "Unscheduled"}`}</span>
               </h1>
               <h1 className="flex justify-between">
                 Tags <span>Tag</span>
@@ -247,7 +280,7 @@ export default function MainPage({ switchView }: mainPageProps) {
             </article>
             <section className="flex justify-between gap-4">
               <button
-                className="bg-black text-white p-2 pointer text-[1.2rem] w-full"
+                className="bg-black text-white p-2 cursor-pointer text-[1.2rem] w-full"
                 onClick={() => {
                   if (chosenTodo) deleteToDo(chosenTodo._id);
                 }}
@@ -255,7 +288,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                 Delete
               </button>
               <button
-                className="bg-black text-white p-2 pointer text-[1.2rem] w-full"
+                className="bg-black text-white p-2 cursor-pointer text-[1.2rem] w-full"
                 onClick={() => {
                   if (chosenTodo) updateToDo(chosenTodo._id);
                   else console.log("ChosendTodo is null");

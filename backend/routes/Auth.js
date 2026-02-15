@@ -23,7 +23,7 @@ router.post("/register", async (req, res) => {
         username,
         email,
         password: hashedPassword,
-        createdAt: Date.now(),
+        createdAt: new Date(),
       });
 
       await newUser.save();
@@ -62,9 +62,9 @@ router.post("/todos", middleware, async (req, res) => {
       title: req.body.title,
       userId: req.user.userId,
       completed: false,
-      createdAt: Date.now(),
+      createdAt: new Date(),
       dueDate: null,
-      updatedAt: Date.now(),
+      updatedAt: new Date(),
     });
     res.status(201).json({ message: "Todo added successfully" });
   } catch (error) {
@@ -114,7 +114,7 @@ router.patch("/todos/:id", middleware, async (req, res) => {
         title: req.body.title,
         completed: req.body.completed,
         dueDate: req.body.dueDate,
-        updatedAt: Date.now(),
+        updatedAt: new Date(),
       },
       { new: true },
     );
