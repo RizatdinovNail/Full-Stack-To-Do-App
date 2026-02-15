@@ -73,6 +73,8 @@ export default function MainPage({ switchView }: mainPageProps) {
       const res = await api.delete<Todo[]>(`/todos/${todoId}`);
 
       setTodos(res.data);
+      setChosenTodoTitle("");
+      setChosenTodo(undefined);
     } catch (error) {
       console.error("Failed to get backend res: " + error);
     }
@@ -81,8 +83,14 @@ export default function MainPage({ switchView }: mainPageProps) {
   const updateToDo = async (todoId: string) => {
     try {
       setTodoDesc(false);
-      const res = await api.patch<Todo>(`/todos/${todoId}`);
-      setTodos(res.data);
+      const res = await api.patch<Todo>(`/todos/${todoId}`, {
+        title: chosenTodoTitle,
+      });
+      setTodos((prev) =>
+        prev.map((todo) => (todo._id === todoId ? res.data : todo)),
+      );
+      setChosenTodoTitle("");
+      setChosenTodo(undefined);
     } catch (error) {
       console.error("Failed to update todo: " + error);
     }
@@ -177,9 +185,9 @@ export default function MainPage({ switchView }: mainPageProps) {
                     <p
                       className="pointer"
                       onClick={() => {
-                        setTodoDesc(true);
                         setChosenTodo(todo);
-                        setChosenTodoTitle(chosenTodo.title);
+                        setChosenTodoTitle(todo.title);
+                        setTodoDesc(true);
                       }}
                     >
                       ···
@@ -240,13 +248,18 @@ export default function MainPage({ switchView }: mainPageProps) {
             <section className="flex justify-between gap-4">
               <button
                 className="bg-black text-white p-2 pointer text-[1.2rem] w-full"
-                onClick={() => deleteToDo(chosenTodo._id)}
+                onClick={() => {
+                  if (chosenTodo) deleteToDo(chosenTodo._id);
+                }}
               >
                 Delete
               </button>
               <button
                 className="bg-black text-white p-2 pointer text-[1.2rem] w-full"
-                onClick={() => updateToDo(chosenTodo._id)}
+                onClick={() => {
+                  if (chosenTodo) updateToDo(chosenTodo._id);
+                  else console.log("ChosendTodo is null");
+                }}
               >
                 Update
               </button>

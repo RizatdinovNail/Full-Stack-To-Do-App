@@ -105,18 +105,18 @@ router.delete("/todos/:id", middleware, async (req, res) => {
 router.patch("/todos/:id", middleware, async (req, res) => {
   try {
     const todoId = req.params.id;
-    const updatedTodo = await Todo.findOneAndUpdate(
+    const updatedTodo = await ToDo.findOneAndUpdate(
       {
         _id: todoId,
         userId: req.user.userId,
       },
       {
-        ...req.body,
-        title: title,
-        completed: completed,
-        dueDate: dueDate,
+        title: req.body.title,
+        completed: req.body.completed,
+        dueDate: req.body.dueDate,
         updatedAt: Date.now(),
       },
+      { new: true },
     );
 
     if (!updatedTodo) {
