@@ -41,14 +41,28 @@ export default function MainPage({ switchView }: mainPageProps) {
   const [chosenTodoCompletionState, setChosenTodoCompletionState] =
     useState(false);
   const [searchInput, setSearchInput] = useState("");
-  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
+  const [filteredByFilters, setFilteredByFilters] = useState<Todo[]>([]);
+  const [filteredBySearch, setFilteredBySearch] = useState<Todo[]>([]);
+  const [openFilters, setOpenFilters] = useState(false);
 
   const allFilters = [
     {
-      name: "Filter1",
+      name: "Completed",
     },
     {
-      name: "Filter2",
+      name: "Incomplete",
+    },
+    {
+      name: "Today",
+    },
+    {
+      name: "Upcoming",
+    },
+    {
+      name: "No Due Date",
+    },
+    {
+      name: "By Tag",
     },
   ];
 
@@ -65,6 +79,10 @@ export default function MainPage({ switchView }: mainPageProps) {
   useEffect(() => {
     fetchTodos();
   }, []);
+
+  useEffect(() => {
+    filterToDos();
+  }, [todos, filters]);
 
   const fetchTodos = async () => {
     const res = await api.get<Todo[]>("/todos");
@@ -86,7 +104,7 @@ export default function MainPage({ switchView }: mainPageProps) {
     try {
       setTodoDesc(false);
       const res = await api.patch<Todo>(`/todos/${todoId}`, {
-        title: chosenTodoTitle,
+        title: chosenTodo?.title,
         completed: chosenTodoCompletionState,
       });
       setTodos((prev) =>
@@ -98,10 +116,53 @@ export default function MainPage({ switchView }: mainPageProps) {
   };
 
   const searchToDo = (query: string) => {
-    const filtered = todos.filter((todo) =>
+    const source = filters.length ? filteredByFilters : todos;
+
+    const filtered = source.filter((todo) =>
       todo.title.toLowerCase().includes(query.toLowerCase()),
     );
-    setFilteredTodos(filtered);
+
+    setFilteredBySearch(filtered);
+  };
+
+  const filterToDos = () => {
+    let result = [...todos];
+
+    filters.forEach((filter) => {
+      switch (filter.name) {
+        case "Completed":
+          result = result.filter((todo) => todo.completed);
+          break;
+        case "Incomplete":
+          result = result.filter((todo) => !todo.completed);
+          break;
+        case "Today":
+          const today = new Date().toISOString().split("T")[0];
+          result = result.filter(
+            (todo) => todo.dueDate && todo.dueDate.split("T")[0] === today,
+          );
+          break;
+        case "Upcoming":
+          const now = new Date();
+          result = result.filter(
+            (todo) => todo.dueDate && new Date(todo.dueDate) > now,
+          );
+          break;
+        case "No Due Date":
+          result = result.filter((todo) => !todo.dueDate);
+          break;
+        default:
+          break;
+      }
+    });
+
+    setFilteredByFilters(result);
+  };
+
+  const displayedTodos = () => {
+    if (searchInput) return filteredBySearch;
+    if (filters.length) return filteredByFilters;
+    return todos;
   };
 
   return (
@@ -131,13 +192,15 @@ export default function MainPage({ switchView }: mainPageProps) {
             </button>
           </article>
           <section className="flex">
-            <section className="cursor-pointer">
+            <section className="relative">
               <svg
                 viewBox="0 0 24 24"
                 width="36"
                 height="36"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                className="cursor-pointer"
+                onClick={() => setOpenFilters(true)}
               >
                 <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                 <g
@@ -155,6 +218,36 @@ export default function MainPage({ switchView }: mainPageProps) {
                   ></path>{" "}
                 </g>
               </svg>
+
+              <ul
+                className={`${openFilters ? "block" : "hidden"} absolute bg-black p-4 flex flex-col gap-2`}
+              >
+                <li
+                  className="text-white cursor-pointer"
+                  onClick={() => setOpenFilters(false)}
+                >
+                  X
+                </li>
+                {allFilters.map((filter) => (
+                  <li
+                    key={filter.name}
+                    className="text-white cursor-pointer"
+                    onClick={() => {
+                      if (filter.name === "All") {
+                        setFilters([]);
+                      } else {
+                        setFilters((prev) =>
+                          prev.some((f) => f.name === filter.name)
+                            ? prev
+                            : [...prev, filter],
+                        );
+                      }
+                    }}
+                  >
+                    {filter.name}
+                  </li>
+                ))}
+              </ul>
             </section>
             <input
               className="bg-black text-white w-full p-2"
@@ -167,26 +260,33 @@ export default function MainPage({ switchView }: mainPageProps) {
             ></input>
           </section>
           <section>
-            <ul className="flex gap-4">
+            <ul className="flex gap-4 flex-wrap">
               {filters.map((filter) => (
                 <li
                   key={filter.name}
                   className="bg-black text-white px-2 py-1 text-[0.8rem] flex items-center gap-2"
                 >
                   {filter.name}
-                  <span>x</span>
+                  <span
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setFilters((prev) => prev.filter((f) => f !== filter));
+                    }}
+                  >
+                    x
+                  </span>
                 </li>
               ))}
             </ul>
           </section>
         </section>
 
-        <section>
+        <section className="overflow-y-auto h-142 no-scrollbar">
           <ul className="flex gap-4 flex-col">
-            {(searchInput ? filteredTodos : todos).map((todo) => (
+            {displayedTodos().map((todo) => (
               <li
                 key={todo._id}
-                className={`flex gap-2 items-center justify-between ${todo.completed ? "hidden" : "block"}`}
+                className={`flex gap-2 items-center justify-between ${filters.some((f) => f.name === "Completed") || todo.completed === false ? "block" : "hidden"}`}
               >
                 <article className="bg-blue-500 text-white flex justify-between p-2 items-center w-full">
                   {todo.title}
@@ -221,7 +321,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                   }}
                   className="cursor-pointer"
                 >
-                  ✓
+                  {todo.completed ? "" : "✓"}
                 </p>
               </li>
             ))}
