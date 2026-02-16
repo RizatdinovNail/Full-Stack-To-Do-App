@@ -5,6 +5,8 @@ import Login from "./pages/login/page";
 import Register from "./pages/register/page";
 import MainPage from "./pages/main/page";
 import NavBar from "./pages/navbar/page";
+import Profile from "./pages/profile/page";
+import Footer from "./pages/footer/page";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("login"); // or "register"
@@ -23,12 +25,21 @@ export default function Home() {
         {activeView !== "login" && activeView !== "register" && (
           <div className="absolute top-4 w-full">
             <NavBar
-              switchView={() => {
-                setActiveView("login");
+              switchView={(profile = true) => {
+                if (profile == true) setActiveView("profile");
+                else setActiveView("login");
               }}
             />
           </div>
         )}
+        {activeView === "profile" && (
+          <Profile
+            switchView={() => {
+              setActiveView("mainPage");
+            }}
+          />
+        )}
+
         {activeView === "register" && (
           <Register
             switchView={() => {
@@ -38,6 +49,11 @@ export default function Home() {
         )}
         {activeView === "mainPage" && (
           <MainPage switchView={() => setActiveView("login")} />
+        )}
+        {activeView === "profile" && (
+          <div className="absolute bottom-4 w-full">
+            <Footer />
+          </div>
         )}
       </div>
       <div className="text-white lg:block hidden">

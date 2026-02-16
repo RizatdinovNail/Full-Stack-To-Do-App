@@ -17,7 +17,7 @@ export default function NavBar({ switchView }: NavBarProprs) {
   };
 
   const changeTheme = () => {
-    return;
+    switchView(true);
   };
 
   const links = [
