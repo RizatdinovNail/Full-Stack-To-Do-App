@@ -4,13 +4,14 @@ import { useState } from "react";
 import Login from "./pages/login/page";
 import Register from "./pages/register/page";
 import MainPage from "./pages/main/page";
+import NavBar from "./pages/navbar/page";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("login"); // or "register"
 
   return (
-    <main className="flex w-full justify-around h-screen items-center">
-      <div className="w-105 h-228 border relative bg-white text-black px-4.5 py-20 rounded-3xl flex justify-center">
+    <main className="flex w-full justify-around items-center pt-1 max-[430px]:pt-0 max-[430px]:bg-white bg-black h-screen max-[430px]:h-auto">
+      <div className="w-105 h-228 border relative bg-white text-black px-4.5 py-20 rounded-3xl flex justify-center max-[430px]:w-full max-[430px]:h-auto max-[430px]:rounded-none max-[430px]:border-none">
         {activeView === "login" && (
           <Login
             switchView={(reg = true) => {
@@ -18,6 +19,11 @@ export default function Home() {
               else setActiveView("mainPage");
             }}
           />
+        )}
+        {activeView !== "login" && activeView !== "register" && (
+          <div className="absolute top-4 w-full">
+            <NavBar />
+          </div>
         )}
         {activeView === "register" && (
           <Register
@@ -30,7 +36,7 @@ export default function Home() {
           <MainPage switchView={() => setActiveView("login")} />
         )}
       </div>
-      <div className="text-white">
+      <div className="text-white lg:block hidden">
         For better experience switch to phone mod or scan this QR code
       </div>
     </main>

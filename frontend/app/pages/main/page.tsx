@@ -168,7 +168,7 @@ export default function MainPage({ switchView }: mainPageProps) {
   return (
     <div className="flex flex-col gap-4 w-full">
       <h1 className="text-[42px] text-center">Add your Todo</h1>
-      <div className="flex flex-col gap-12 h-screen">
+      <div className="flex flex-col gap-12">
         <section className="flex flex-col gap-2">
           <article className="bg-black flex justify-between p-2 gap-2">
             <input
