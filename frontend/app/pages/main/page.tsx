@@ -391,7 +391,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                 className="bg-black text-white p-2 cursor-pointer text-[1.2rem] w-full"
                 onClick={() => {
                   if (chosenTodo) updateToDo(chosenTodo._id);
-                  else console.log("ChosendTodo is null");
+                  else console.log("Chosen Todo is null");
                 }}
               >
                 Update

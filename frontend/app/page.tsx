@@ -22,7 +22,11 @@ export default function Home() {
         )}
         {activeView !== "login" && activeView !== "register" && (
           <div className="absolute top-4 w-full">
-            <NavBar />
+            <NavBar
+              switchView={() => {
+                setActiveView("login");
+              }}
+            />
           </div>
         )}
         {activeView === "register" && (

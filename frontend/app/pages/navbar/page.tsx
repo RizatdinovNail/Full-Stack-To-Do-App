@@ -1,17 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import api from "@/app/api/api";
 
-export default function NavBar() {
+interface NavBarProprs {
+  switchView: (value: boolean) => void;
+}
+
+export default function NavBar({ switchView }: NavBarProprs) {
   const [theme, setTheme] = useState("Light");
   const [navSection, setOpenNavSection] = useState(false);
+
+  const logOut = () => {
+    localStorage.removeItem("token");
+    switchView(false);
+  };
+
+  const changeTheme = () => {
+    return;
+  };
 
   const links = [
     {
       name: "Profile",
+      function: changeTheme,
     },
     {
       name: "Log out",
+      function: logOut,
     },
   ];
 
@@ -46,6 +62,7 @@ export default function NavBar() {
               <li
                 key={l.name}
                 className="flex items-center gap-4 cursor-pointer"
+                onClick={() => l.function()}
               >
                 <span className="w-4 h-4 bg-white"></span>
                 {l.name}
