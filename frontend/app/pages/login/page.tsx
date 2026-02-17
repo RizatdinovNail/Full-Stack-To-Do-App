@@ -1,6 +1,5 @@
 "use client";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface LoginProps {
@@ -13,8 +12,7 @@ export default function Login({ switchView }: LoginProps) {
     password: "",
   });
   const [loginError, setLoginError] = useState(false);
-
-  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
   const inputs = [
     {
@@ -30,10 +28,17 @@ export default function Login({ switchView }: LoginProps) {
       name: "password",
       placholder: "Enter your password...",
       value: formData.password,
-      type: "text",
+      type: "password",
       id: "password",
     },
   ];
+
+  const setInputType = (type: string) => {
+    if (type === "username") return "text";
+    else {
+      return showPassword ? "text" : "password";
+    }
+  };
 
   const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -86,16 +91,26 @@ export default function Login({ switchView }: LoginProps) {
                 id={e.id}
                 name={e.name}
                 value={e.value}
-                type={e.type}
-                className="bg-black text-white p-2"
+                type={setInputType(e.name)}
+                className="bg-black text-white p-2 outline-none"
                 required
                 onChange={handleChange}
               ></input>
+              {e.name === "password" && (
+                <article className="flex justify-end mt-1">
+                  <p
+                    className="text-[0.8rem] cursor-pointer"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  >
+                    {showPassword ? "Hide Password" : "Show Password"}
+                  </p>
+                </article>
+              )}
             </div>
           ))}
           <button
             type="submit"
-            className="bg-black text-white py-4 text-[24px] w-fit px-12 pointer"
+            className="bg-black text-white py-4 text-[24px] w-fit px-12 cursor-pointer"
           >
             Log In
           </button>
@@ -104,7 +119,7 @@ export default function Login({ switchView }: LoginProps) {
           <article className="flex flex-col items-center">
             <p>Don't have an account yet?</p>
             <button
-              className="font-bold pointer"
+              className="font-bold cursor-pointer"
               onClick={() => switchView(true)}
             >
               Sign Up

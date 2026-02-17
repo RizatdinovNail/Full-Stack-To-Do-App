@@ -36,7 +36,7 @@ export default function Register({ switchView }: RegisterProps) {
       name: "password",
       placholder: "Enter your password...",
       value: formData.password,
-      type: "text",
+      type: "password",
       id: "password",
     },
     {
@@ -44,7 +44,7 @@ export default function Register({ switchView }: RegisterProps) {
       name: "repeatPassword",
       placholder: "Repeat your password...",
       value: formData.repeatPassword,
-      type: "text",
+      type: "password",
       id: "repeatPassword",
     },
   ];
