@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 
 import middleware from "./Middleware.js";
 import User from "../models/User.js";
@@ -52,6 +53,57 @@ router.post("/login", async (req, res) => {
     res.json({ token });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/me", middleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("-password");
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Error getting the user: " + error });
+  }
+});
+
+router.patch("/update", middleware, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { username, email, currentPassword, newPassword } = req.body;
+
+    const updates = {};
+
+    // Update username
+    if (username) updates.username = username;
+
+    // Update email
+    if (email) updates.email = email;
+
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Update password
+    if (newPassword) {
+      if (!currentPassword)
+        return res.status(400).json({ message: "Current password required" });
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+      if (!isMatch)
+        return res.status(400).json({ message: "Incorrect current password" });
+
+      updates.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    // Apply updates
+    const updatedUser = await User.findByIdAndUpdate(userId, updates, {
+      new: true,
+      runValidators: true,
+    }).select("-password"); // Never return password
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user: " + error.message });
   }
 });
 
@@ -126,6 +178,34 @@ router.patch("/todos/:id", middleware, async (req, res) => {
     res.send(updatedTodo);
   } catch (error) {
     console.error("Failed to update todo: " + error);
+  }
+});
+
+router.get("/stats", middleware, async (req, res) => {
+  try {
+    const userId = new mongoose.Types.ObjectId(req.user.userId);
+
+    const stats = await ToDo.aggregate([
+      { $match: { userId: userId } },
+      {
+        $group: {
+          _id: "$completed",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    let completed = 0;
+    let incomplete = 0;
+
+    stats.forEach((item) => {
+      if (item._id === true) completed = item.count;
+      else incomplete = item.count;
+    });
+
+    res.json({ completed, incomplete });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
   }
 });
 

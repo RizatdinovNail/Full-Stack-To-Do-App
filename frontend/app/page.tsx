@@ -9,7 +9,7 @@ import Profile from "./pages/profile/page";
 import Footer from "./pages/footer/page";
 
 export default function Home() {
-  const [activeView, setActiveView] = useState("login"); // or "register"
+  const [activeView, setActiveView] = useState("login");
 
   return (
     <main className="flex w-full justify-around items-center pt-1 max-[430px]:pt-0 max-[430px]:bg-white bg-black h-screen max-[430px]:h-auto">
