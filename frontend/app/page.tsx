@@ -7,13 +7,15 @@ import MainPage from "./pages/main/page";
 import NavBar from "./pages/navbar/page";
 import Profile from "./pages/profile/page";
 import Footer from "./pages/footer/page";
+import Background from "./pages/background/page";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("login");
 
   return (
-    <main className="flex w-full justify-around items-center pt-1 max-[430px]:pt-0 max-[430px]:bg-white bg-black h-screen max-[430px]:h-auto">
-      <div className="w-105 h-228 border relative bg-white text-black px-4.5 py-20 rounded-3xl flex justify-center max-[430px]:w-full max-[430px]:h-auto max-[430px]:rounded-none max-[430px]:border-none">
+    <main className="flex w-full justify-around items-center pt-1 max-[430px]:pt-0 bg-(--background) h-screen max-[430px]:h-auto">
+      <div className="w-105 h-228 relative bg-(--background) rounded-[40px] border-12 text-black px-4.5 py-20 flex justify-center max-[430px]:h-screen max-[430px]:w-full  overflow-hidden max-[430px]:rounded-none max-[430px]:border-none">
+        <Background />
         {activeView === "login" && (
           <Login
             switchView={(reg = true) => {

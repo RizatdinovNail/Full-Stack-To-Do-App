@@ -2,3 +2,23 @@
 @utility no-scrollbar {
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
+
+:root {
+  --inputFields: #5c7a92;
+  --inputLabels: #84a9dc;
+  --headers: #a0c4e1;
+  --background: #0e1012;
+  --circle: #2b373e;
+  --button: #3a4a55;
+  --buttonText: #a0c4e1;
+  --smallText: #84a9dc;
+  --links: #a0c4e1;
+  --icons: #1c2428;
+  --placeholders: #3a4a55;
+  --todoBG: #4a6572;
+  --todoPlacholder: #a0c4e1;
+}
+
+body {
+  background-color: var(--background);
+}
