@@ -1,6 +1,10 @@
 @import "tailwindcss";
-@utility no-scrollbar {
-  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+/* custom utility for hiding scrollbars */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 :root {
@@ -16,9 +20,13 @@
   --icons: #1c2428;
   --placeholders: #3a4a55;
   --todoBG: #4a6572;
-  --todoPlacholder: #a0c4e1;
+  --todoPlaceholder: #a0c4e1;
 }
 
 body {
   background-color: var(--background);
+}
+
+* {
+  font-family: "Gowun_Batang";
 }

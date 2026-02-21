@@ -100,7 +100,7 @@ export default function Profile({ switchView }: profileProps) {
   ];
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 z-2">
       <svg
         width="30"
         height="22"

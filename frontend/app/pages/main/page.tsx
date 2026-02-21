@@ -166,13 +166,15 @@ export default function MainPage({ switchView }: mainPageProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <h1 className="text-[42px] text-center">Add your Todo</h1>
-      <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-4 w-full z-2">
+      <h1 className="text-[42px] text-center text-(--headers)">
+        Add your Todo
+      </h1>
+      <div className="flex flex-col gap-12 mt-8">
         <section className="flex flex-col gap-2">
-          <article className="bg-black flex justify-between p-2 gap-2">
+          <article className="bg-(--inputFields) p-2 outline-none rounded-xl text-(--icons) text-[1.2rem] flex justify-between">
             <input
-              className="bg-black text-white w-full"
+              className="placeholder:text-(--placeholders) bg-(--inputFields) text-(--inputText) text-[1.2rem] w-full outline-none"
               placeholder="Ex: Walk a dog"
               value={todoTitle}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -185,13 +187,13 @@ export default function MainPage({ switchView }: mainPageProps) {
               }}
             ></input>
             <button
-              className="bg-white text-black p-2 px-4"
+              className="bg-(--button) text-(--buttonText) p-1 px-4 rounded-xl cursor-pointer"
               onClick={() => createTodo()}
             >
               Add
             </button>
           </article>
-          <section className="flex">
+          <section className="flex mt-4 items-center gap-4">
             <section className="relative">
               <svg
                 viewBox="0 0 24 24"
@@ -214,7 +216,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                     fillRule="evenodd"
                     clipRule="evenodd"
                     d="M5.78584 3C4.24726 3 3 4.24726 3 5.78584C3 6.59295 3.28872 7.37343 3.81398 7.98623L6.64813 11.2927C7.73559 12.5614 8.33333 14.1773 8.33333 15.8483V18C8.33333 19.6569 9.67648 21 11.3333 21H12.6667C14.3235 21 15.6667 19.6569 15.6667 18V15.8483C15.6667 14.1773 16.2644 12.5614 17.3519 11.2927L20.186 7.98624C20.7113 7.37343 21 6.59294 21 5.78584C21 4.24726 19.7527 3 18.2142 3H5.78584Z"
-                    fill="#000000"
+                    fill="var(--inputFields)"
                   ></path>{" "}
                 </g>
               </svg>
@@ -250,7 +252,7 @@ export default function MainPage({ switchView }: mainPageProps) {
               </ul>
             </section>
             <input
-              className="bg-black text-white w-full p-2"
+              className="bg-(--inputFields) placeholder:text-(--placeholders) text-(--inputText) text-[1.2rem] w-full outline-none p-2 rounded-xl"
               placeholder="Search..."
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value;
@@ -259,23 +261,23 @@ export default function MainPage({ switchView }: mainPageProps) {
               }}
             ></input>
           </section>
-          <section>
+          <section className="mt-2">
             <ul className="flex gap-4 flex-wrap">
               {filters.map((filter) => (
-                <li
+                <p
                   key={filter.name}
-                  className="bg-black text-white px-2 py-1 text-[0.8rem] flex items-center gap-2"
+                  className="bg-(--placeholders) text-(--smallText) font-extralight rounded-xl px-2 text-[1rem] flex items-center gap-4"
                 >
                   {filter.name}
                   <span
-                    className="cursor-pointer"
+                    className="cursor-pointer text-[1.2rem]"
                     onClick={() => {
                       setFilters((prev) => prev.filter((f) => f !== filter));
                     }}
                   >
                     x
                   </span>
-                </li>
+                </p>
               ))}
             </ul>
           </section>
@@ -288,7 +290,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                 key={todo._id}
                 className={`flex gap-2 items-center justify-between ${filters.some((f) => f.name === "Completed") || todo.completed === false ? "block" : "hidden"}`}
               >
-                <article className="bg-blue-500 text-white flex justify-between p-2 items-center w-full">
+                <article className="bg-(--todoBG) rounded-xl text-[1.2rem] text-(--buttonText) flex justify-between p-2 items-center w-full">
                   {todo.title}
                   <span className="flex gap-4 items-center">
                     {/*<section className="flex gap-2 text-[0.6rem]">
@@ -301,16 +303,16 @@ export default function MainPage({ switchView }: mainPageProps) {
                         </p>
                       ))}
                     </section>*/}
-                    <p
-                      className="cursor-pointer"
+                    <button
+                      className="bg-(--button) text-(--buttonText) px-4 rounded-xl cursor-pointer"
                       onClick={() => {
                         setChosenTodo(todo);
                         setChosenTodoTitle(todo.title);
                         setTodoDesc(true);
                       }}
                     >
-                      ···
-                    </p>
+                      Edit
+                    </button>
                   </span>
                 </article>
                 <p
@@ -319,7 +321,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                     setChosenTodoCompletionState(true);
                     updateToDo(todo._id);
                   }}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-[1.5rem] text-(--buttonText)"
                 >
                   {todo.completed ? "" : "✓"}
                 </p>
@@ -333,54 +335,54 @@ export default function MainPage({ switchView }: mainPageProps) {
           <p>The To-do title can not be empty!</p>
         </section>
         <section
-          className={`absolute top-0 bottom-0 right-0 left-0 bg-black/80 rounded-3xl ${todoDesc ? "block" : "hidden"} flex justify-center items-center`}
+          className={`absolute top-0 bottom-0 right-0 left-0 bg-black/80 rounded-3xl backdrop-blur-sm ${todoDesc ? "block" : "hidden"} flex justify-center items-center`}
         >
-          <section className="bg-white p-4 relative w-80 flex flex-col gap-8">
-            <article className="flex items-center justify-center">
+          <section className="bg-(--todoBG) rounded-xl p-4 relative w-92 flex flex-col gap-8">
+            <article className="flex items-start justify-center">
               <input
-                className="text-[1.3rem] text-center"
+                className="text-[2rem] text-center text-(--headers) font-bold"
                 value={chosenTodoTitle}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setChosenTodoTitle(e.target.value)
                 }
               ></input>
               <p
-                className="absolute right-4 cursor-pointer"
+                className="absolute right-4 cursor-pointer text-(--smallText)"
                 onClick={() => {
                   setTodoDesc(false);
                 }}
               >
-                x
+                Cancel
               </p>
             </article>
-            <article>
-              <h1 className="flex justify-between">
+            <article className="text-(--smallText) flex flex-col gap-4">
+              <h1 className="flex justify-between font-bold">
                 Time of creation{" "}
-                <span>
+                <span className="font-light">
                   {chosenTodo
                     ? new Date(chosenTodo.createdAt).toISOString().split("T")[0]
                     : "Error"}
                 </span>
               </h1>
-              <h1 className="flex justify-between">
+              <h1 className="flex justify-between font-bold">
                 Last Updated{" "}
-                <span>
+                <span className="font-light">
                   {chosenTodo
                     ? new Date(chosenTodo.updatedAt).toISOString().split("T")[0]
                     : "Error"}
                 </span>
               </h1>
-              <h1 className="flex justify-between">
+              <h1 className="flex justify-between font-bold">
                 Due to{" "}
-                <span>{`${chosenTodo?.dueDate ? chosenTodo?.dueDate : "Unscheduled"}`}</span>
+                <span className="font-light">{`${chosenTodo?.dueDate ? chosenTodo?.dueDate : "Unscheduled"}`}</span>
               </h1>
-              <h1 className="flex justify-between">
-                Tags <span>Tag</span>
+              <h1 className="flex justify-between font-bold">
+                Tags <span className="font-light cursor-pointer">+</span>
               </h1>
             </article>
             <section className="flex justify-between gap-4">
               <button
-                className="bg-black text-white p-2 cursor-pointer text-[1.2rem] w-full"
+                className="bg-(--button) text-(--buttonText) rounded-xl py-1 text-[24px] w-full cursor-pointer"
                 onClick={() => {
                   if (chosenTodo) deleteToDo(chosenTodo._id);
                 }}
@@ -388,7 +390,7 @@ export default function MainPage({ switchView }: mainPageProps) {
                 Delete
               </button>
               <button
-                className="bg-black text-white p-2 cursor-pointer text-[1.2rem] w-full"
+                className="bg-(--button) text-(--buttonText) rounded-xl py-1 text-[24px] w-full cursor-pointer"
                 onClick={() => {
                   if (chosenTodo) updateToDo(chosenTodo._id);
                   else console.log("Chosen Todo is null");

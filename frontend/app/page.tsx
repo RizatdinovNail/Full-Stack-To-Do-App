@@ -25,7 +25,7 @@ export default function Home() {
           />
         )}
         {activeView !== "login" && activeView !== "register" && (
-          <div className="absolute top-4 w-full">
+          <div className="absolute top-4 w-full z-3">
             <NavBar
               switchView={(profile = true) => {
                 if (profile == true) setActiveView("profile");

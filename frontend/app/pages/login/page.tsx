@@ -85,7 +85,7 @@ export default function Login({ switchView }: LoginProps) {
             <div key={e.id} className="flex flex-col w-full">
               <label
                 htmlFor={e.name}
-                className="text-[2rem] font-regular text-(--inputLabels)"
+                className="text-[2rem] font-light text-(--inputLabels)"
               >
                 {e.label}
               </label>
@@ -95,7 +95,7 @@ export default function Login({ switchView }: LoginProps) {
                 value={e.value}
                 autoComplete="off"
                 type={setInputType(e.name)}
-                className="bg-(--inputFields)  p-2 outline-none rounded-xl text-(--icons)"
+                className="bg-(--inputFields) p-2 outline-none rounded-xl text-(--icons) text-[1.2rem]"
                 required
                 onChange={handleChange}
               ></input>

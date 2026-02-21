@@ -10,7 +10,8 @@ export default function Background() {
       h-105 
       bg-(--circle)
       rounded-full
-      z-0"
+      z-0
+      blur-sm"
       ></div>
       <div
         className="absolute 
@@ -21,7 +22,8 @@ export default function Background() {
       h-105 
       bg-(--circle)
       rounded-full
-      z-0"
+      z-0
+      blur-sm"
       ></div>
     </section>
   );

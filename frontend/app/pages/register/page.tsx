@@ -79,46 +79,52 @@ export default function Register({ switchView }: RegisterProps) {
   };
 
   return (
-    <div className="flex flex-col gap-8 -mt-12">
-      <h1 className="text-[48px] text-center">Sign Up</h1>
+    <div className="flex flex-col gap-8 -mt-12 z-2">
+      <h1 className="text-[48px] text-center text-(--headers)">Sign Up</h1>
       <section>
         <form
           className="flex flex-col gap-2 items-center"
           onSubmit={registerUser}
         >
-          {inputs.map((e) => (
-            <div key={e.id} className="flex flex-col w-full">
-              <label htmlFor={e.name} className="text-[2rem] font-extralight">
-                {e.label}
-              </label>
-              <div className="flex flex-col">
-                <input
-                  id={e.id}
-                  name={e.name}
-                  value={e.value}
-                  type={setInputType(e.name)}
-                  className="bg-black text-white p-2"
-                  required
-                  onChange={handleChange}
-                ></input>
-                {e.name === "password" && (
-                  <article className="flex justify-end mt-1">
-                    <p
-                      className="text-[0.8rem] cursor-pointer"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    >
-                      {showPassword ? "Hide Password" : "Show Password"}
-                    </p>
-                  </article>
-                )}
+          <section className="flex flex-col w-full gap-6">
+            {inputs.map((e) => (
+              <div key={e.id} className="flex flex-col w-full">
+                <label
+                  htmlFor={e.name}
+                  className="text-[24px] font-extralight text-(--inputLabels)"
+                >
+                  {e.label}
+                </label>
+                <div className="flex flex-col">
+                  <input
+                    id={e.id}
+                    name={e.name}
+                    value={e.value}
+                    type={setInputType(e.name)}
+                    className="bg-(--inputFields) text-[1.2rem] p-2 outline-none rounded-xl text-(--icons)"
+                    required
+                    onChange={handleChange}
+                  ></input>
+                  {e.name === "password" && (
+                    <article className="flex justify-end mt-1">
+                      <p
+                        className="text-[0.8rem] cursor-pointer text-(--smallText)"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                      >
+                        {showPassword ? "Hide Password" : "Show Password"}
+                      </p>
+                    </article>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </section>
+
           <article className="flex gap-2 items-center">
-            <input type="checkbox" required></input>
-            <label>
+            <input type="checkbox" className="cursor-pointer" required></input>
+            <label className="text-(--smallText) font-light">
               By clicking here you are agreeing to our{" "}
-              <a className="underline underline-offset-2">
+              <a className="underline underline-offset-2 text(--links) font-normal cursor-pointer">
                 Terms and Conditions
               </a>
             </label>
@@ -126,13 +132,14 @@ export default function Register({ switchView }: RegisterProps) {
 
           <button
             type="submit"
-            className="bg-black text-white py-4 text-[24px] w-fit px-12 cursor-pointer"
+            className="bg-(--button) text-(--buttonText) mt-8 rounded-xl py-1 text-[24px] w-fit px-24 cursor-pointer"
           >
             Sign Up
           </button>
         </form>
-        <section className="flex flex-col mt-8 gap-8">
-          <article className="flex flex-col items-center">
+
+        <section className="flex flex-col mt-8 gap-8 absolute bottom-4 left-0 right-0">
+          <article className="flex flex-col items-center text-(--smallText)">
             <p>Do you have an account?</p>
             <button
               className="font-bold cursor-pointer"
