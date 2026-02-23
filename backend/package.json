@@ -9,7 +9,9 @@
     "hash": "^0.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.1.0",
-    "mongoose": "^9.1.6"
+    "mongoose": "^9.1.6",
+    "multer": "^2.0.2",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

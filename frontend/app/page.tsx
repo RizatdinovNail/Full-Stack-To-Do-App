@@ -8,9 +8,11 @@ import NavBar from "./pages/navbar/page";
 import Profile from "./pages/profile/page";
 import Footer from "./pages/footer/page";
 import Background from "./pages/background/page";
+import api from "@/app/api/api";
 
 export default function Home() {
   const [activeView, setActiveView] = useState("login");
+  const [photo, setPhoto] = useState("");
 
   return (
     <main className="flex w-full justify-around items-center pt-1 max-[430px]:pt-0 bg-(--background) h-screen max-[430px]:h-auto">
@@ -28,9 +30,14 @@ export default function Home() {
           <div className="absolute top-4 w-full z-3">
             <NavBar
               switchView={(profile = true) => {
-                if (profile == true) setActiveView("profile");
+                if (activeView === "mainPage" && profile == true)
+                  setActiveView("profile");
+                else if (activeView === "profile" && profile == true)
+                  setActiveView("mainPage");
                 else setActiveView("login");
               }}
+              photo={photo}
+              activeView={activeView}
             />
           </div>
         )}
@@ -39,6 +46,8 @@ export default function Home() {
             switchView={() => {
               setActiveView("mainPage");
             }}
+            setPhoto={setPhoto}
+            photo={photo}
           />
         )}
 
@@ -50,7 +59,11 @@ export default function Home() {
           />
         )}
         {activeView === "mainPage" && (
-          <MainPage switchView={() => setActiveView("login")} />
+          <MainPage
+            switchView={() => setActiveView("login")}
+            setPhoto={setPhoto}
+            photo={photo}
+          />
         )}
         {activeView === "profile" && (
           <div className="absolute bottom-4 w-full">

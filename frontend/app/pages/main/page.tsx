@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 
 interface mainPageProps {
   switchView: (value: boolean) => void;
+  setPhoto: (photo: string) => void;
+  photo: string;
 }
 
 interface Todo {
@@ -30,7 +32,11 @@ interface Filter {
   name: string;
 }
 
-export default function MainPage({ switchView }: mainPageProps) {
+export default function MainPage({
+  switchView,
+  setPhoto,
+  photo,
+}: mainPageProps) {
   const [todoTitle, setToDoTitle] = useState("");
   const [errorCreatingToDo, setError] = useState(false);
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -78,11 +84,21 @@ export default function MainPage({ switchView }: mainPageProps) {
 
   useEffect(() => {
     fetchTodos();
+    getPhoto();
   }, []);
 
   useEffect(() => {
     filterToDos();
   }, [todos, filters]);
+
+  const getPhoto = async () => {
+    try {
+      const res = await api.get("/user/photo");
+      setPhoto(res.data);
+    } catch (error) {
+      console.error("Failed to get photo: " + error);
+    }
+  };
 
   const fetchTodos = async () => {
     const res = await api.get<Todo[]>("/todos");

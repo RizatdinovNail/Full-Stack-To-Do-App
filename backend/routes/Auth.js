@@ -7,6 +7,9 @@ import ToDo from "../models/ToDo.js";
 import Tag from "../models/Tag.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import upload from "./Upload.js";
+import fs from "fs";
+import path from "path";
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
@@ -23,6 +26,7 @@ router.post("/register", async (req, res) => {
       const newUser = new User({
         username,
         email,
+        photo: "",
         password: hashedPassword,
         createdAt: new Date(),
       });
@@ -33,6 +37,15 @@ router.post("/register", async (req, res) => {
       console.error(error);
       res.status(400).json({ error: error.message });
     }
+  }
+});
+
+router.get("/user/photo", middleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    res.json(user.photo);
+  } catch (error) {
+    console.error(error);
   }
 });
 
@@ -107,6 +120,38 @@ router.patch("/update", middleware, async (req, res) => {
   }
 });
 
+router.patch(
+  "/update-photo",
+  middleware,
+  upload.single("photo"),
+  async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      if (!req.file)
+        return res.status(400).json({ message: "No file uploaded" });
+
+      const user = await User.findById(userId);
+
+      // delete old photo if exists
+      if (user.photo) {
+        const oldPath = path.join("uploads", path.basename(user.photo));
+
+        fs.unlink(oldPath, (err) => {
+          if (err) console.log("Old photo delete warning:", err.message);
+        });
+      }
+
+      const photoUrl = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
+
+      user.photo = photoUrl;
+      await user.save();
+
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+);
 //======================= TODOS AUTH =======================
 router.post("/todos", middleware, async (req, res) => {
   try {

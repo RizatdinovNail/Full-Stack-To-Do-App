@@ -73,6 +73,7 @@ export default function Register({ switchView }: RegisterProps) {
 
   const setInputType = (type: string) => {
     if (type === "username") return "text";
+    else if (type === "email") return "email";
     else {
       return showPassword ? "text" : "password";
     }

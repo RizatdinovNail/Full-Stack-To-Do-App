@@ -33,6 +33,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/uploads", express.static("uploads"));
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
